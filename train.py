@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--model', '-m', type=str, default=None)
     parser.add_argument('--opt', type=str, default=None)
     parser.add_argument('--epoch', '-e', type=int, default=40)
+    parser.add_argument('--looptimes', '-t', type=int, default=5)
     parser.add_argument('--lr', '-l', type=float, default=0.01)
     parser.add_argument('--batch', '-b', type=int, default=128)
     parser.add_argument('--noplot', dest='plot', action='store_false',
@@ -43,8 +44,8 @@ def main():
         raise RuntimeError('Invalid dataset choice.')
 
     # Set up a neural network to train.
-    model = L.Classifier(network.LocalPCN(class_labels=class_labels, LoopTimes=5))
-    
+    model = L.Classifier(network.LocalPCN(class_labels=class_labels, LoopTimes=args.looptimes))
+
     train_iter = iterators.SerialIterator(train[:45000], batch_size=args.batch, shuffle=True)
     test_iter = iterators.SerialIterator(train[45000:], batch_size=args.batch, repeat=False, shuffle=False)
 
@@ -81,7 +82,7 @@ def main():
 
     trainer.extend(extensions.PrintReport(['epoch', 'main/loss', 'validation/main/loss','main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
     trainer.extend(extensions.ProgressBar(update_interval=1))
-    
+
     #Plot computation graph
     trainer.extend(extensions.dump_graph('main/loss'))
 
