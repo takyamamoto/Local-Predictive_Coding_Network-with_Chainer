@@ -19,18 +19,19 @@ Chainer model is defined with `network.py`
 ### Train
 When you use GPU, please run following command.
 ```
-python train.py -g 0
+python train.py -g 0 -e 100
 ```
 ## Results
 
 ### Loss
-<img src="https://github.com/takyamamoto/DeepPredictiveCodingNetwork-with-Chainer/blob/master/results/loss.png" width=70%>
+<img src="https://github.com/takyamamoto/Local-Predictive_Coding_Network-with_Chainer/blob/master/results/loss.png" width=70%>
 
 ### Accuracy
-<img src="https://github.com/takyamamoto/DeepPredictiveCodingNetwork-with-Chainer/blob/master/results/accuracy.png" width=70%>
+<img src="https://github.com/takyamamoto/Local-Predictive_Coding_Network-with_Chainer/blob/master/results/accuracy.png" width=70%>
 
 ## Model
-<img src="https://github.com/takyamamoto/DeepPredictiveCodingNetwork-with-Chainer/blob/master/results/cg.png" width=20%>
+The following image is the model when LoopTimes equals **1**.
+<img src="https://github.com/takyamamoto/Local-Predictive_Coding_Network-with_Chainer/blob/master/results/cg.png" width=20%>
 
 ### Plot computational graph of the model
 First, you have to install `Graphviz`. If you use Anaconda, you can install with next command.
