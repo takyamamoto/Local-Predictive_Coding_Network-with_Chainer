@@ -51,7 +51,7 @@ class Block(chainer.Chain):
         one = Variable(xp.array([1],  dtype=xp.float32))
         update_rate = F.absolute(self.update_rate(one))
 
-        # Recurrent loop 
+        # Recurrent loop
         for t in range(self.LoopTimes):
             if t == 0:
                 rt = r0
@@ -72,9 +72,7 @@ class LocalPCN(chainer.Chain):
                 block6 = Block(256, 256, LoopTimes=LoopTimes),
                 block7 = Block(256, 512, LoopTimes=LoopTimes),
                 block8 = Block(512, 512, LoopTimes=LoopTimes),
-                fc1 = L.Linear(None, 512, nobias=True),
-                bn_fc1 = L.BatchNormalization(512),
-                fc2 = L.Linear(None, class_labels, nobias=True)
+                fc = L.Linear(512, class_labels, nobias=True)
                 )
         self.return_out = return_out
 
@@ -89,9 +87,5 @@ class LocalPCN(chainer.Chain):
         h = self.block6(h)
         h = self.block7(h)
         h = self.block8(h)
-        #h = F.dropout(h, ratio=0.5)
-        h = self.fc1(h)
-        h = self.bn_fc1(h)
-        h = F.relu(h)
-        #h = F.dropout(h, ratio=0.5)
-        return self.fc2(h)
+        h = F.average(h, axis=(2,3)) # Global Average Pooling
+        return self.fc(h)
