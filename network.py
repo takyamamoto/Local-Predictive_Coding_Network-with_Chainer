@@ -87,6 +87,6 @@ class LocalPCN(chainer.Chain):
         h = self.block6(h)
         h = self.block7(h)
         h = self.block8(h)
-        h = F.average(h, axis=(2,3)) # Global Average Pooling
         h = self.bn(h)
+        h = F.average(h, axis=(2,3)) # Global Average Pooling
         return self.fc(h)

@@ -54,7 +54,7 @@ def main():
 
     optimizer = optimizers.NesterovAG(lr=args.lr, momentum=0.9)
     optimizer.setup(model)
-    optimizer.add_hook(chainer.optimizer_hooks.WeightDecay(1e-4))
+    optimizer.add_hook(chainer.optimizer_hooks.WeightDecay(1e-3))
 
     num_train_samples = 45000
     train_iter = iterators.SerialIterator(train[:num_train_samples], batch_size=args.batch, shuffle=True)
@@ -73,13 +73,10 @@ def main():
 
     trainer.extend(extensions.Evaluator(test_iter, model, device=args.gpu))
     trainer.extend(extensions.LogReport(trigger=(10, 'iteration')))
+    trainer.extend(extensions.observe_lr(), trigger=(10, 'iteration'))
 
     # Schedule of a learning rate (LinearShift)
-    fifty = int(args.epoch * 0.5 * num_train_samples / args.batch)
-    seventyfive = int(args.epoch * 0.75 * num_train_samples / args.batch)
-    trainer.extend(extensions.LinearShift("lr", (args.lr, args.lr*0.1), (fifty,fifty+args.batch)))
-    trainer.extend(extensions.LinearShift("lr", (args.lr*0.1, args.lr*0.01), (seventyfive,seventyfive+args.batch)))
-
+    trainer.extend(extensions.LinearShift('lr', (args.lr, args.lr*0.1), (args.epoch*0.5, args.epoch*0.5+1)), trigger=(1, 'epoch'))
 
     # Save two plot images to the result dir
     if args.plot and extensions.PlotReport.available():
@@ -91,7 +88,10 @@ def main():
                 ['main/accuracy', 'validation/main/accuracy'],
                 'epoch', file_name='accuracy.png'))
 
-    trainer.extend(extensions.PrintReport(['epoch', 'main/loss', 'validation/main/loss','main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
+
+    trainer.extend(extensions.PrintReport(['epoch', 'main/loss', 'validation/main/loss',
+                                           'main/accuracy', 'validation/main/accuracy',
+                                           'lr', 'elapsed_time']), trigger=(1, 'iteration'))
     trainer.extend(extensions.ProgressBar(update_interval=1))
 
     #Plot computation graph
