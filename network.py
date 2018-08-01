@@ -62,7 +62,7 @@ class Block(chainer.Chain):
 
 # Define Local Predictive Coding Network
 class LocalPCN(chainer.Chain):
-    def __init__(self, class_labels=10, LoopTimes=5, return_out=False):
+    def __init__(self, class_labels=10, LoopTimes=5):
         super(LocalPCN, self).__init__(
                 block1 = Block(3, 64, LoopTimes=LoopTimes),
                 block2 = Block(64, 64, LoopTimes=LoopTimes),
@@ -72,9 +72,9 @@ class LocalPCN(chainer.Chain):
                 block6 = Block(256, 256, LoopTimes=LoopTimes),
                 block7 = Block(256, 512, LoopTimes=LoopTimes),
                 block8 = Block(512, 512, LoopTimes=LoopTimes),
+                bn = L.BatchNormalization(512),
                 fc = L.Linear(512, class_labels, nobias=True)
                 )
-        self.return_out = return_out
 
     def __call__(self, x):
         h = self.block1(x)
@@ -88,4 +88,5 @@ class LocalPCN(chainer.Chain):
         h = self.block7(h)
         h = self.block8(h)
         h = F.average(h, axis=(2,3)) # Global Average Pooling
+        h = self.bn(h)
         return self.fc(h)
